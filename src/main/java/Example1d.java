@@ -43,34 +43,30 @@ import net.imglib2.view.Views;
 /**
  * Open an ArrayImg< FloatType > and display partly and rotated
  */
-public class Example1d
-{
-	public Example1d() throws ImgIOException
-	{
-		// open file as float with ImgOpener
-		Img< FloatType > img =
-			new ImgOpener().openImg( "DrosophilaWing.tif", new FloatType() );
+public class Example1d {
 
-		// display image
-		ImageJFunctions.show( img );
+    public Example1d() throws ImgIOException {
+        // open file as float with ImgOpener
+        Img<FloatType> img = new ImgOpener().openImgs("DrosophilaWing.tif", new FloatType()).get(0);
 
-		// use a View to define an interval (min and max coordinate, inclusive) to display
-		RandomAccessibleInterval< FloatType > view =
-				Views.interval( img, new long[] { 200, 200 }, new long[]{ 500, 350 } );
+        // display image
+        ImageJFunctions.show(img);
 
-		// display only the part of the Img
-		ImageJFunctions.show( view );
+        // use a View to define an interval (min and max coordinate, inclusive) to display
+        RandomAccessibleInterval<FloatType> view = Views.interval(img, new long[]{200, 200}, new long[]{500, 350});
 
-		// or the same area rotated by 90 degrees (x-axis (0) and y-axis (1) switched)
-		ImageJFunctions.show( Views.rotate( view, 0, 1 ) );
-	}
+        // display only the part of the Img
+        ImageJFunctions.show(view);
 
-	public static void main( String[] args ) throws ImgIOException
-	{
-		// open an ImageJ window
-		new ImageJ();
+        // or the same area rotated by 90 degrees (x-axis (0) and y-axis (1) switched)
+        ImageJFunctions.show(Views.rotate(view, 0, 1));
+    }
 
-		// run the example
-		new Example1d();
-	}
+    public static void main(String[] args) throws ImgIOException {
+        // open an ImageJ window
+        new ImageJ();
+
+        // run the example
+        new Example1d();
+    }
 }
