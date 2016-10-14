@@ -47,51 +47,48 @@ import net.imglib2.type.numeric.RealType;
 /**
  * Opens a file with SCIFIO's ImgOpener as an ImgLib2 Img.
  */
-public class Example1b
-{
-	// within this method we define <T> to be a RealType and a NativeType which means the
-	// Type is able to map the data into an java basic type array
-	public < T extends RealType< T > & NativeType< T > > Example1b()
-		throws ImgIOException
-	{
-		// define the file to open
-		File file = new File( "DrosophilaWing.tif" );
-		String path = file.getAbsolutePath();
+public class Example1b {
+    // within this method we define <T> to be a RealType and a NativeType which means the
+    // Type is able to map the data into an java basic type array
 
-		// create the ImgOpener
-		ImgOpener imgOpener = new ImgOpener();
+    public <T extends RealType<T> & NativeType<T>> Example1b() throws ImgIOException {
+        // define the file to open
+        File file = new File("DrosophilaWing.tif");
+        String path = file.getAbsolutePath();
 
-		// open with ImgOpener. The type (e.g. ArrayImg, PlanarImg, CellImg) is
-		// automatically determined. For a small image that fits in memory, this
-		// should open as an ArrayImg.
-		Img< T > image = (Img< T >) imgOpener.openImg( path );
+        // create the ImgOpener
+        ImgOpener imgOpener = new ImgOpener();
 
-		// display it via ImgLib using ImageJ
-		ImageJFunctions.show( image );
+        // open with ImgOpener. The type (e.g. ArrayImg, PlanarImg, CellImg) is
+        // automatically determined. For a small image that fits in memory, this
+        // should open as an ArrayImg.
+        Img<T> image = (Img<T>) imgOpener.openImgs(path).get(0);
 
-		// create the SCIFIOConfig. This gives us configuration control over how
-		// the ImgOpener will open its datasets.
-		SCIFIOConfig config = new SCIFIOConfig();
+        // display it via ImgLib using ImageJ
+        ImageJFunctions.show(image);
 
-		// If we know what type of Img we want, we can encourage their use through
-		// an SCIFIOConfig instance. CellImgs dynamically load image regions and are
-		// useful when an image won't fit in memory
-		config.imgOpenerSetImgModes( ImgMode.CELL );
+        // create the SCIFIOConfig. This gives us configuration control over how
+        // the ImgOpener will open its datasets.
+        SCIFIOConfig config = new SCIFIOConfig();
 
-		// open with ImgOpener as a CellImg
-		Img< T > imageCell = (Img< T >) imgOpener.openImg( path, config );
+        // If we know what type of Img we want, we can encourage their use through
+        // an SCIFIOConfig instance. CellImgs dynamically load image regions and are
+        // useful when an image won't fit in memory
+        config.imgOpenerSetImgModes(ImgMode.CELL);
 
-		// display it via ImgLib using ImageJ. The Img type only affects how the
-		// underlying data is accessed, so these images should look identical.
-		ImageJFunctions.show( imageCell );
-	}
+        // open with ImgOpener as a CellImg
+        Img<T> imageCell = (Img<T>) imgOpener.openImgs(path, config).get(0);
 
-	public static void main( String[] args ) throws ImgIOException
-	{
-		// open an ImageJ window
-		new ImageJ();
+        // display it via ImgLib using ImageJ. The Img type only affects how the
+        // underlying data is accessed, so these images should look identical.
+        ImageJFunctions.show(imageCell);
+    }
 
-		// run the example
-		new Example1b();
-	}
+    public static void main(String[] args) throws ImgIOException {
+        // open an ImageJ window
+        new ImageJ();
+
+        // run the example
+        new Example1b();
+    }
 }
