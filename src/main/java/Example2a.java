@@ -46,60 +46,56 @@ import net.imglib2.type.numeric.real.FloatType;
  * @author Stephan Preibisch & Stephan Saalfeld
  *
  */
-public class Example2a
-{
-	public Example2a() throws ImgIOException
-	{
-		// open with ImgOpener as a FloatType
-		Img< FloatType > img = new ImgOpener().openImg( "DrosophilaWing.tif",
-			new FloatType() );
+public class Example2a {
 
-		// copy the image, as it is a generic method it also works with FloatType
-		Img< FloatType > duplicate = copyImage( img );
+    public Example2a() throws ImgIOException {
+        // open with ImgOpener as a FloatType
+        Img<FloatType> img = new ImgOpener().openImgs("DrosophilaWing.tif", new FloatType()).get(0);
 
-		// display the copy
-		ImageJFunctions.show( duplicate );
-	}
+        // copy the image, as it is a generic method it also works with FloatType
+        Img<FloatType> duplicate = copyImage(img);
 
-	/**
-	 * Generic, type-agnostic method to create an identical copy of an Img
-	 *
-	 * @param input - the Img to copy
-	 * @return - the copy of the Img
-	 */
-	public < T extends Type< T > > Img< T > copyImage( final Img< T > input )
-	{
-		// create a new Image with the same properties
-		// note that the input provides the size for the new image as it implements
-		// the Interval interface
-		Img< T > output = input.factory().create( input, input.firstElement() );
+        // display the copy
+        ImageJFunctions.show(duplicate);
+    }
 
-		// create a cursor for both images
-		Cursor< T > cursorInput = input.cursor();
-		Cursor< T > cursorOutput = output.cursor();
+    /**
+     * Generic, type-agnostic method to create an identical copy of an Img
+     *
+     * @param <T> Img pixel type
+     * @param input - the Img to copy
+     * @return - the copy of the Img
+     */
+    public <T extends Type<T>> Img<T> copyImage(final Img<T> input) {
+        // create a new Image with the same properties
+        // note that the input provides the size for the new image as it implements
+        // the Interval interface
+        Img<T> output = input.factory().create(input, input.firstElement());
 
-		// iterate over the input
-		while ( cursorInput.hasNext())
-		{
-			// move both cursors forward by one pixel
-			cursorInput.fwd();
-			cursorOutput.fwd();
+        // create a cursor for both images
+        Cursor<T> cursorInput = input.cursor();
+        Cursor<T> cursorOutput = output.cursor();
 
-			// set the value of this pixel of the output image to the same as the input,
-			// every Type supports T.set( T type )
-			cursorOutput.get().set( cursorInput.get() );
-		}
+        // iterate over the input
+        while (cursorInput.hasNext()) {
+            // move both cursors forward by one pixel
+            cursorInput.fwd();
+            cursorOutput.fwd();
 
-		// return the copy
-		return output;
-	}
+            // set the value of this pixel of the output image to the same as the input,
+            // every Type supports T.set( T type )
+            cursorOutput.get().set(cursorInput.get());
+        }
 
-	public static void main( String[] args ) throws ImgIOException
-	{
-		// open an ImageJ window
-		new ImageJ();
+        // return the copy
+        return output;
+    }
 
-		// run the example
-		new Example2a();
-	}
+    public static void main(String[] args) throws ImgIOException {
+        // open an ImageJ window
+        new ImageJ();
+
+        // run the example
+        new Example2a();
+    }
 }
