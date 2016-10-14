@@ -55,7 +55,8 @@ public class Example2a {
         // copy the image, as it is a generic method it also works with FloatType
         Img<FloatType> duplicate = copyImage(img);
 
-        // display the copy
+        // display the original and copied images
+        ImageJFunctions.show(img);
         ImageJFunctions.show(duplicate);
     }
 
