@@ -45,99 +45,143 @@ import net.imglib2.type.Type;
 import net.imglib2.type.numeric.real.FloatType;
 
 /**
- * Here we want to copy an ArrayImg into a CellImg using a generic method,
- * but we cannot do it with simple Cursors as they have a different iteration order.
+ * Here we want to copy an ArrayImg into a CellImg using a generic method, but
+ * we cannot do it with simple Cursors as they have a different iteration order.
  *
  * @author Stephan Preibisch & Stephan Saalfeld
  *
  */
-public class Example2b
-{
+public class Example2b {
 
-	public Example2b() throws ImgIOException
-	{
-		// open with ImgOpener. In addition to using ImgOptions, we can directly
-		// pass an ImgFactory to the ImgOpener. This bypasses the Img selection
-		// heuristic and allows custom ImgFactory implementations to be used
-		Img< FloatType > img = (Img< FloatType >) new ImgOpener().openImg( "DrosophilaWing.tif",
-			new ArrayImgFactory< FloatType >() );
+    public Example2b() throws ImgIOException {
+        // open with ImgOpener. In addition to using ImgOptions, we can directly
+        // pass an ImgFactory to the ImgOpener. This bypasses the Img selection
+        // heuristic and allows custom ImgFactory implementations to be used
+        // public List<SCIFIOImgPlus<?>> openImgs(String source, ImgFactory imgFactory) throws ImgIOException
+        Img<FloatType> img = (Img<FloatType>) new ImgOpener().openImgs("DrosophilaWing.tif",
+                new ArrayImgFactory<FloatType>()).get(0);
 
-		// copy the image into a CellImg with a cellsize of 20x20
-//		Img< FloatType > duplicate = copyImageWrong( img, new CellImgFactory< FloatType >( 20 ) );
-		Img< FloatType > duplicate = copyImageCorrect( img, new CellImgFactory< FloatType >( 20 ) );
+        // copy the image into a CellImg with a cellsize of 20x20
+        //Img<FloatType> duplicate = copyImageWrong(img, new CellImgFactory<FloatType>(20));
+        Img<FloatType> dupForward = copyImageCorrectForward(img, new CellImgFactory<FloatType>(20));
+        Img<FloatType> dupBackward = copyImageCorrectBackward(img, new CellImgFactory<FloatType>(20));
 
-		// display the copy and the original
-		ImageJFunctions.show( img );
-		ImageJFunctions.show( duplicate );
-	}
-
-	/**
-	 * WARNING: This method makes a mistake on purpose!
-	 */
-	public < T extends Type< T >> Img< T > copyImageWrong( final Img< T > input,
-		final ImgFactory< T > imgFactory )
-	{
-		// create a new Image with the same dimensions but the other imgFactory
-		// note that the input provides the size for the new image as it
-		// implements the Interval interface
-		Img< T > output = imgFactory.create( input, input.firstElement() );
-
-		// create a cursor for both images
-		Cursor< T > cursorInput = input.cursor();
-		Cursor< T > cursorOutput = output.cursor();
-
-		// iterate over the input cursor
-		while ( cursorInput.hasNext())
-		{
-			// move both forward
-			cursorInput.fwd();
-			cursorOutput.fwd();
-
-			// set the value of this pixel of the output image, every Type supports T.set( T type )
-			cursorOutput.get().set( cursorInput.get() );
-		}
-
-		// return the copy
-		return output;
-	}
-
-	/**
-	 * This method copies the image correctly, using a RandomAccess.
-	 */
-  public < T extends Type< T >> Img< T > copyImageCorrect( final Img< T > input,
-    final ImgFactory< T > imgFactory )
-  {
-    // create a new Image with the same dimensions but the other imgFactory
-    // note that the input provides the size for the new image by implementing the Interval interface
-    Img< T > output = imgFactory.create( input, input.firstElement() );
-
-    // create a cursor that automatically localizes itself on every move
-    Cursor< T > cursorInput = input.localizingCursor();
-    RandomAccess< T > randomAccess = output.randomAccess();
-
-    // iterate over the input cursor
-    while ( cursorInput.hasNext())
-    {
-      // move input cursor forward
-      cursorInput.fwd();
-
-      // set the output cursor to the position of the input cursor
-      randomAccess.setPosition( cursorInput );
-
-      // set the value of this pixel of the output image, every Type supports T.set( T type )
-      randomAccess.get().set( cursorInput.get() );
+        // display the two copies and the original
+        ImageJFunctions.show(img);
+        ImageJFunctions.show(dupForward);
+        ImageJFunctions.show(dupBackward);
     }
 
-    // return the copy
-    return output;
-  }
+    /**
+     * WARNING: This method makes a mistake on purpose!
+     *
+     * @param <T>
+     * @param input
+     * @param imgFactory
+     * @return
+     */
+    public <T extends Type<T>> Img<T> copyImageWrong(
+            final Img<T> input,
+            final ImgFactory<T> imgFactory) {
+        // create a new Image with the same dimensions but the other imgFactory
+        // note that the input provides the size for the new image as it
+        // implements the Interval interface
+        Img<T> output = imgFactory.create(input, input.firstElement());
 
-	public static void main( String[] args ) throws ImgIOException
-	{
-		// open an ImageJ window
-		new ImageJ();
+        // create a cursor for both images
+        Cursor< T> cursorInput = input.cursor();
+        Cursor< T> cursorOutput = output.cursor();
 
-		// run the example
-		new Example2b();
-	}
+        // iterate over the input cursor
+        while (cursorInput.hasNext()) {
+            // move both forward
+            cursorInput.fwd();
+            cursorOutput.fwd();
+
+            // set the value of this pixel of the output image, every Type supports T.set(T type)
+            cursorOutput.get().set(cursorInput.get());
+        }
+
+        // return the copy
+        return output;
+    }
+
+    /**
+     * This method copies the image correctly, using a RandomAccess.
+     *
+     * @param <T>
+     * @param input
+     * @param imgFactory
+     * @return
+     */
+    public <T extends Type<T>> Img<T> copyImageCorrectForward(
+            final Img<T> input,
+            final ImgFactory<T> imgFactory) {
+        // create a new Image with the same dimensions but the other imgFactory
+        // note that the input provides the size for the new image by implementing the Interval interface
+        Img<T> output = imgFactory.create(input, input.firstElement());
+
+        // create a cursor that automatically localizes itself on every move
+        Cursor<T> cursorInput = input.localizingCursor();
+        RandomAccess<T> randomAccess = output.randomAccess();
+
+        // iterate over the input cursor
+        while (cursorInput.hasNext()) {
+            // move input cursor forward
+            cursorInput.fwd();
+
+            // set the output cursor to the position of the input cursor
+            randomAccess.setPosition(cursorInput);
+
+            // set the value of this pixel of the output image, every Type supports T.set( T type )
+            randomAccess.get().set(cursorInput.get());
+        }
+
+        // return the copy
+        return output;
+    }
+
+    /**
+     * This method copies the image correctly, using a RandomAccess,
+     *
+     * @param <T>
+     * @param input
+     * @param imgFactory
+     * @return
+     */
+    public <T extends Type<T>> Img<T> copyImageCorrectBackward(
+            final Img<T> input,
+            final ImgFactory<T> imgFactory) {
+        // create a new Image with the same dimensions but the other imgFactory
+        // note that the input provides the size for the new image by implementing the Interval interface
+        Img<T> output = imgFactory.create(input, input.firstElement());
+
+        // create a cursor that automatically localizes itself on every move
+        RandomAccess<T> randomAccess = input.randomAccess();
+        Cursor<T> cursorOutput = output.localizingCursor();
+
+        // iterate over the input cursor
+        while (cursorOutput.hasNext()) {
+            // move output cursor forward
+            cursorOutput.fwd();
+
+            // set the input cursor to the position of the output cursor
+            randomAccess.setPosition(cursorOutput);
+
+            // set the value of this pixel of the output image to the input pixel, 
+            // every Type supports T.set(T type)
+            cursorOutput.get().set(randomAccess.get());
+        }
+
+        // return the copy
+        return output;
+    }
+
+    public static void main(String[] args) throws ImgIOException {
+        // open an ImageJ window
+        new ImageJ();
+
+        // run the example
+        new Example2b();
+    }
 }
