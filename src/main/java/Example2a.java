@@ -50,7 +50,9 @@ public class Example2a {
 
     public Example2a() throws ImgIOException {
         // open with ImgOpener as a FloatType
-        Img<FloatType> img = new ImgOpener().openImgs("DrosophilaWing.tif", new FloatType()).get(0);
+        // public <T extends RealType<T> & NativeType<T>> List<SCIFIOImgPlus<T>> openImgs(String source, T type) throws ImgIOException
+        Img<FloatType> img = new ImgOpener().openImgs("DrosophilaWing.tif", 
+                new FloatType()).get(0);
 
         // copy the image, as it is a generic method it also works with FloatType
         Img<FloatType> duplicate = copyImage(img);
