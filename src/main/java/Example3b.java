@@ -44,44 +44,41 @@ import net.imglib2.util.RealSum;
  * @author Stephan Preibisch & Stephan Saalfeld
  *
  */
-public class Example3b
-{
-	public < T extends RealType< T > & NativeType< T > > Example3b() throws
-		ImgIOException
-	{
-		// open with ImgOpener
-		final Img< T > img = (Img< T >) new ImgOpener().openImg( "DrosophilaWing.tif" );
+public class Example3b {
 
-		// compute average of the image
-		final double avg = computeAverage( img );
-		System.out.println( "average Value: " + avg );
-	}
+    public <T extends RealType<T> & NativeType<T>> Example3b()
+            throws ImgIOException {
+        // open with ImgOpener
+        final Img<T> img = (Img<T>) new ImgOpener().openImgs("DrosophilaWing.tif").get(0);
 
-	/**
-	 * Compute the average intensity for an {@link Iterable}.
-	 *
-	 * @param input - the input data
-	 * @return - the average as double
-	 */
-	public < T extends RealType< T > > double computeAverage( final Iterable< T > input )
-	{
-		// Count all values using the RealSum class.
-		// It prevents numerical instabilities when adding up millions of pixels
-		final RealSum realSum = new RealSum();
-		long count = 0;
+        // compute average of the image
+        final double avg = computeAverage(img);
+        System.out.println("Average Value: " + avg);
+    }
 
-		for ( final T type : input )
-		{
-			realSum.add( type.getRealDouble() );
-			++count;
-		}
+    /**
+     * Compute the average intensity for an {@link Iterable}.
+     *
+     * @param <T> value type
+     * @param input - the input data
+     * @return - the average as double
+     */
+    public <T extends RealType<T>> double computeAverage(final Iterable<T> input) {
+        // Count all values using the RealSum class.
+        // It prevents numerical instabilities when adding up millions of pixels
+        final RealSum realSum = new RealSum();
+        long count = 0;
 
-		return realSum.getSum() / count;
-	}
+        for (final T type : input) {
+            realSum.add(type.getRealDouble());
+            ++count;
+        }
 
-	public static void main( final String[] args ) throws ImgIOException
-	{
-		// run the example
-		new Example3b();
-	}
+        return realSum.getSum() / count;
+    }
+
+    public static void main(final String[] args) throws ImgIOException {
+        // run the example
+        new Example3b();
+    }
 }
