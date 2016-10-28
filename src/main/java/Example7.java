@@ -48,122 +48,115 @@ import net.imglib2.interpolation.randomaccess.NLinearInterpolatorFactory;
 import net.imglib2.interpolation.randomaccess.NearestNeighborInterpolatorFactory;
 import net.imglib2.type.Type;
 import net.imglib2.type.numeric.real.FloatType;
-import net.imglib2.util.Util;
 import net.imglib2.view.Views;
 
 /**
  * Use three different interpolators to 10x magnify a small area
  */
-public class Example7
-{
-	public Example7() throws ImgIOException
-	{
-		// open with ImgOpener using an ArrayImgFactory
-		Img< FloatType > img = new ImgOpener().openImg( "DrosophilaWing.tif",
-			new FloatType() );
+public class Example7 {
 
-		ImageJFunctions.show( img );
+    public Example7() throws ImgIOException {
+        // open with ImgOpener
+        Img<FloatType> img = new ImgOpener().openImgs("DrosophilaWing.tif", new FloatType()).get(0);
 
-		// create an InterpolatorFactory RealRandomAccessible using nearst neighbor interpolation
-		NearestNeighborInterpolatorFactory< FloatType > factory1 =
-			new NearestNeighborInterpolatorFactory< FloatType >();
+        ImageJFunctions.show(img);
 
-		// create an InterpolatorFactory RealRandomAccessible using linear interpolation
-		NLinearInterpolatorFactory< FloatType > factory2 =
-			new NLinearInterpolatorFactory< FloatType >();
+        // create an InterpolatorFactory RealRandomAccessible using nearst neighbor interpolation
+        NearestNeighborInterpolatorFactory<FloatType> factory1 = new NearestNeighborInterpolatorFactory<FloatType>();
 
-		// create an InterpolatorFactory RealRandomAccessible using lanczos interpolation
-		LanczosInterpolatorFactory< FloatType > factory3 =
-			new LanczosInterpolatorFactory< FloatType >();
+        // create an InterpolatorFactory RealRandomAccessible using linear interpolation
+        NLinearInterpolatorFactory<FloatType> factory2 = new NLinearInterpolatorFactory<FloatType>();
 
-		// create a RandomAccessible using the factory and views method
-		// it is important to extend the image first, the interpolation scheme might
-		// grep pixels outside of the boundaries even when locations inside are queried
-		// as they integrate pixel information in a local neighborhood - the size of
-		// this neighborhood depends on which interpolator is used
-		RealRandomAccessible< FloatType > interpolant1 = Views.interpolate(
-			Views.extendMirrorSingle( img ), factory1 );
-		RealRandomAccessible< FloatType > interpolant2 = Views.interpolate(
-			Views.extendMirrorSingle( img ), factory2 );
-		RealRandomAccessible< FloatType > interpolant3 = Views.interpolate(
-			Views.extendMirrorSingle( img ), factory3 );
+        // create an InterpolatorFactory RealRandomAccessible using lanczos interpolation
+        LanczosInterpolatorFactory<FloatType> factory3 = new LanczosInterpolatorFactory<FloatType>();
 
-		// define the area in the interpolated image
-		double[] min = new double[]{ 105.12, 40.43 };
-		double[] max = new double[]{ 129.56, 74.933 };
+        // create a RandomAccessible using the factory and views method
+        // it is important to extend the image first, the interpolation scheme might
+        // grep pixels outside of the boundaries even when locations inside are queried
+        // as they integrate pixel information in a local neighborhood - the size of
+        // this neighborhood depends on which interpolator is used
+        RealRandomAccessible<FloatType> interpolant1 = Views.interpolate(Views.extendMirrorSingle(img), factory1);
+        RealRandomAccessible<FloatType> interpolant2 = Views.interpolate(Views.extendMirrorSingle(img), factory2);
+        RealRandomAccessible<FloatType> interpolant3 = Views.interpolate(Views.extendMirrorSingle(img), factory3);
 
-		FinalRealInterval interval = new FinalRealInterval( min, max );
+        // define the area in the interpolated image
+        double[] min = new double[]{105.12, 40.43};
+        double[] max = new double[]{129.56, 74.933};
 
-		ImageJFunctions.show( magnify( interpolant1, interval,
-			new ArrayImgFactory< FloatType >(), 10 ) ).setTitle( "Nearest Neighbor Interpolation" );
-		ImageJFunctions.show( magnify( interpolant2, interval,
-			new ArrayImgFactory< FloatType >(), 10 ) ).setTitle( "Linear Interpolation" );
-		ImageJFunctions.show( magnify( interpolant3, interval,
-			new ArrayImgFactory< FloatType >(), 10 ) ).setTitle( "Lanczos Interpolation" );
-	}
+        FinalRealInterval interval = new FinalRealInterval(min, max);
+        
+        Img<FloatType> mi1 = magnify(interpolant1, interval, new ArrayImgFactory<FloatType>(), 10);
+        Img<FloatType> mi2 = magnify(interpolant2, interval, new ArrayImgFactory<FloatType>(), 10);
+        Img<FloatType> mi3 = magnify(interpolant3, interval, new ArrayImgFactory<FloatType>(), 10);
 
-	/**
-	 * Compute a magnified version of a given real interval
-	 *
-	 * @param source - the input data
-	 * @param interval - the real interval on the source that should be magnified
-	 * @param factory - the image factory for the output image
-	 * @param magnification - the ratio of magnification
-	 * @return - an Img that contains the magnified image content
-	 */
-	public static < T extends Type< T > > Img< T > magnify( RealRandomAccessible< T > source,
-		RealInterval interval, ImgFactory< T > factory, double magnification )
-	{
-		int numDimensions = interval.numDimensions();
+        ImageJFunctions.show(mi1).setTitle("Nearest Neighbor Interpolation");
+        ImageJFunctions.show(mi2).setTitle("Linear Interpolation");
+        ImageJFunctions.show(mi3).setTitle("Lanczos Interpolation");
+    }
 
-		// compute the number of pixels of the output and the size of the real interval
-		long[] pixelSize = new long[ numDimensions ];
-		double[] intervalSize = new double[ numDimensions ];
+    /**
+     * Compute a magnified version of a given real interval
+     *
+     * @param <T> value type
+     * @param source - the input data
+     * @param interval - the real interval on the source that should be
+     * magnified
+     * @param factory - the image factory for the output image
+     * @param magnification - the ratio of magnification
+     * @return - an Img that contains the magnified image content
+     */
+    public static <T extends Type<T>> Img<T> magnify(
+            RealRandomAccessible<T> source,
+            RealInterval interval,
+            ImgFactory<T> factory,
+            double magnification) {
+        final int numDimensions = interval.numDimensions();
 
-		for ( int d = 0; d < numDimensions; ++d )
-		{
-			intervalSize[ d ] = interval.realMax( d ) - interval.realMin( d );
-			pixelSize[ d ] = Math.round( intervalSize[ d ] * magnification ) + 1;
-		}
+        // compute the number of pixels of the output and the size of the real interval
+        long[] pixelSize = new long[numDimensions];
+        double[] intervalSize = new double[numDimensions];
 
-		// create the output image
-		Img< T > output = factory.create( pixelSize, source.realRandomAccess().get() );
+        for (int d = 0; d < numDimensions; ++d) {
+            intervalSize[d] = interval.realMax(d) - interval.realMin(d);
+            pixelSize[d] = Math.round(intervalSize[d] * magnification) + 1;
+        }
 
-		// cursor to iterate over all pixels
-		Cursor< T > cursor = output.localizingCursor();
+        // create the output image
+        Img<T> output = factory.create(pixelSize, source.realRandomAccess().get());
 
-		// create a RealRandomAccess on the source (interpolator)
-		RealRandomAccess< T > realRandomAccess = source.realRandomAccess();
+        // cursor to iterate over all pixels
+        Cursor<T> cursor = output.localizingCursor();
 
-		// the temporary array to compute the position
-		double[] tmp = new double[ numDimensions ];
+        // create a RealRandomAccess on the source (interpolator)
+        RealRandomAccess<T> realRandomAccess = source.realRandomAccess();
 
-		// for all pixels of the output image
-		while ( cursor.hasNext() )
-		{
-			cursor.fwd();
+        // the temporary array to compute the position
+        double[] tmp = new double[numDimensions];
 
-			// compute the appropriate location of the interpolator
-			for ( int d = 0; d < numDimensions; ++d )
-				tmp[ d ] = cursor.getDoublePosition( d ) / output.realMax( d ) * intervalSize[ d ]
-						+ interval.realMin( d );
+        // for all pixels of the output image
+        while (cursor.hasNext()) {
+            cursor.fwd();
 
-			// set the position
-			realRandomAccess.setPosition( tmp );
+            // compute the appropriate location of the interpolator
+            for (int d = 0; d < numDimensions; ++d) {
+                tmp[d] = cursor.getDoublePosition(d) / output.realMax(d) * intervalSize[d] + interval.realMin(d);
+            }
 
-			// set the new value
-			cursor.get().set( realRandomAccess.get() );
-		}
+            // set the position
+            realRandomAccess.setPosition(tmp);
 
-		return output;
-	}
+            // set the new value
+            cursor.get().set(realRandomAccess.get());
+        }
 
-	public static void main( String[] args ) throws ImgIOException
-	{
-		// open an ImageJ window
-		new ImageJ();
+        return output;
+    }
 
-		// run the example
-		new Example7();
-	}
+    public static void main(String[] args) throws ImgIOException {
+        // open an ImageJ window
+        new ImageJ();
+
+        // run the example
+        new Example7();
+    }
 }
