@@ -45,30 +45,29 @@ import net.imglib2.type.numeric.real.FloatType;
  * @author Stephan Preibisch & Stephan Saalfeld
  *
  */
-public class Example6a1
-{
-	public Example6a1() throws ImgIOException
-	{
-		// open with ImgOpener as a FloatType
-		Img< FloatType > image = new ImgOpener().openImg( "DrosophilaWing.tif",
-			new FloatType() );
+public class Example6a1 {
 
-		// perform gaussian convolution with float precision
-		double[] sigma = new double[ image.numDimensions() ];
+    public Example6a1() throws ImgIOException {
+        // open with ImgOpener as a FloatType
+        Img< FloatType> image = new ImgOpener().openImg("DrosophilaWing.tif",
+                new FloatType());
 
-		for ( int d = 0; d < image.numDimensions(); ++d )
-			sigma[ d ] = 8;
+        // perform gaussian convolution with float precision
+        double[] sigma = new double[image.numDimensions()];
 
-		// convolve & display
-		ImageJFunctions.show( Gauss.toFloat( sigma, image ) );
-	}
+        for (int d = 0; d < image.numDimensions(); ++d) {
+            sigma[d] = 8;
+        }
 
-	public static void main( String[] args ) throws ImgIOException
-	{
-		// open an ImageJ window
-		new ImageJ();
+        // convolve & display
+        ImageJFunctions.show(Gauss.toFloat(sigma, image));
+    }
 
-		// run the example
-		new Example6a1();
-	}
+    public static void main(String[] args) throws ImgIOException {
+        // open an ImageJ window
+        new ImageJ();
+
+        // run the example
+        new Example6a1();
+    }
 }
